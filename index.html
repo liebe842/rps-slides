@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>랜덤 가위바위보 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#111;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center}
+#stage>section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .35s}
+#stage>section.on{opacity:1;visibility:visible}
+section aside{display:none}
+img{display:block}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;font:14px 'Nanum Gothic',sans-serif;color:#ddd;opacity:0;transition:opacity .3s}
+body:hover #bar{opacity:1}
+#bar button{background:#333;color:#eee;border:0;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:35vh;overflow:auto;background:rgba(255,255,255,.96);color:#263046;border-radius:12px;padding:16px 20px;font:18px/1.6 'Nanum Gothic',sans-serif;display:none;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+body.notes #notes{display:block}
+@media print{html,body{overflow:visible;background:#fff}#bar,#notes{display:none}#stage{position:static;transform:none!important}#stage>section{position:relative;opacity:1;visibility:visible;page-break-after:always}@page{size:1920px 1080px;margin:0}}
+</style>
+</head>
+<body>
+<div id="stage">
+<section id="cover" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;align-items:center;gap:72px">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:44px;color:#E8590C;background:#FFE2C7;padding:12px 32px;border-radius:999px;align-self:start">엔트리 코딩 교실</p>
+<h1 style="font-family:'Jua', Arial, sans-serif;font-size:110px;font-weight:400;line-height:1.15">컴퓨터와<br>가위바위보 대결!</h1>
+<p style="font-size:44px;font-weight:700;color:#4A5568;line-height:1.4">랜덤 가위바위보 게임 만들기</p>
+</div>
+<img src="img/hero.jpg" alt="아이와 로봇이 가위바위보를 하는 그림" style="width:880px;height:495px;object-fit:cover;border-radius:40px;border:8px solid #FFFFFF;box-shadow:0px 16px 48px rgba(38,48,70,0.18)">
+<aside>오늘은 컴퓨터와 가위바위보를 하는 게임을 엔트리로 만들어요. 컴퓨터는 아무거나(무작위로) 내요. 다음 시간에는 컴퓨터를 더 똑똑하게 만들어 볼 거예요.</aside>
+</section>
+<section id="goal" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">오늘의 목표</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">이런 게임을 만들어요</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:64px;align-items:center">
+<img src="img/stage-play3.jpg" alt="게임 실행 화면: 나는 보, 컴퓨터는 바위, 내가 이겼어요" style="width:960px;height:541px;object-fit:contain;border-radius:32px;border:6px solid #FFFFFF;box-shadow:0px 12px 40px rgba(38,48,70,0.15)">
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="background:#FFFFFF;border-radius:28px;padding:32px 36px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:44px;color:#2563EB">① 키를 눌러요</p>
+<p style="font-size:32px;line-height:1.4">1, 2, 3 키로 손을 내요</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:32px 36px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:44px;color:#7C3AED">② 컴퓨터도 내요</p>
+<p style="font-size:32px;line-height:1.4">컴퓨터는 아무거나 골라요</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:32px 36px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:44px;color:#C2410C">③ 이기면 +1점!</p>
+<p style="font-size:32px;line-height:1.4">점수판에 점수가 올라가요</p>
+</div>
+</div>
+</div>
+<aside>완성된 게임 화면이에요. 키보드 숫자 1, 2, 3을 누르면 내 손이 바뀌고, 컴퓨터도 손을 내요. 누가 이겼는지 아래에 글자로 나오고, 위쪽 점수판 점수가 올라가요.</aside>
+</section>
+<section id="numbers" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">0단계 · 설계</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">컴퓨터는 숫자를 좋아해요</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;background:#FFFFFF;border-radius:40px;padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px;border:6px solid #FBBF24">
+<img src="img/scissors.png" alt="가위 손" style="width:240px;height:240px;object-fit:contain">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:56px">가위</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:110px;color:#C2410C;line-height:1">1</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:40px;padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px;border:6px solid #60A5FA">
+<img src="img/rock.png" alt="바위 손" style="width:240px;height:240px;object-fit:contain">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:56px">바위</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:110px;color:#2563EB;line-height:1">2</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:40px;padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px;border:6px solid #4ADE80">
+<img src="img/paper.png" alt="보 손" style="width:240px;height:240px;object-fit:contain">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:56px">보</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:110px;color:#15803D;line-height:1">3</p>
+</div>
+</div>
+<aside>컴퓨터는 "가위", "바위" 같은 말보다 숫자를 더 잘 다뤄요. 그래서 가위는 1, 바위는 2, 보는 3으로 약속해요. 이 약속은 게임이 끝날 때까지 꼭 지켜야 해요. 학생들에게 "왜 숫자로 바꾸면 편할까?"라고 물어보세요.</aside>
+</section>
+<section id="parts" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">0단계 · 준비물</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">무엇이 필요할까요?</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:40px">
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:40px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400;color:#2563EB">오브젝트 · 등장인물</h3>
+<div style="display:flex;flex-direction:row;gap:16px">
+<img src="img/kid.png" alt="나 캐릭터" style="width:140px;height:140px;object-fit:contain">
+<img src="img/robot.png" alt="컴퓨터 로봇" style="width:140px;height:140px;object-fit:contain">
+</div>
+<ul style="font-size:32px;line-height:1.6">
+<li>나 · 컴퓨터</li>
+<li>점수판 글상자</li>
+<li>결과 글상자</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:40px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400;color:#7C3AED">변수 · 기억 상자</h3>
+<ul style="font-size:32px;line-height:1.6">
+<li>나의선택</li>
+<li>컴퓨터선택</li>
+<li>판정</li>
+<li>나의점수</li>
+<li>컴퓨터점수</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:40px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400;color:#15803D">신호 · 바통</h3>
+<ul style="font-size:32px;line-height:1.6">
+<li>컴퓨터차례</li>
+<li>판정하기</li>
+<li>결과표시</li>
+</ul>
+</div>
+</div>
+<aside>오브젝트는 무대에 나오는 등장인물이에요. 변수는 숫자를 기억하는 상자예요. 신호는 이어달리기 바통처럼 "이제 네 차례야!" 하고 다음 오브젝트에게 넘겨주는 거예요. 엔트리의 [자료] 블록에서 변수와 신호를 먼저 만들어 두세요.</aside>
+</section>
+<section id="flow" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">0단계 · 흐름</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">게임은 이 순서로 움직여요</h2>
+</div>
+<div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between">
+<div style="width:270px;background:#FFFFFF;border-radius:32px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;border:5px solid #60A5FA">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:72px;color:#2563EB;line-height:1">1·2·3</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;text-align:center;line-height:1.2">키를<br>눌러요</p>
+</div>
+<x-shape kind="arrow-right" style="background:#F59E0B;width:72px;height:40px"></x-shape>
+<div style="width:270px;background:#FFFFFF;border-radius:32px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;border:5px solid #F472B6">
+<img src="img/kid.png" alt="나" style="width:110px;height:110px;object-fit:contain">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;text-align:center;line-height:1.2">내 손이<br>바뀌어요</p>
+</div>
+<x-shape kind="arrow-right" style="background:#F59E0B;width:72px;height:40px"></x-shape>
+<div style="width:270px;background:#FFFFFF;border-radius:32px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;border:5px solid #A78BFA">
+<img src="img/robot.png" alt="컴퓨터" style="width:110px;height:110px;object-fit:contain">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;text-align:center;line-height:1.2">컴퓨터가<br>골라요</p>
+</div>
+<x-shape kind="arrow-right" style="background:#F59E0B;width:72px;height:40px"></x-shape>
+<div style="width:270px;background:#FFFFFF;border-radius:32px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;border:5px solid #FB923C">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:72px;color:#C2410C;line-height:1">?</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;text-align:center;line-height:1.2">누가<br>이겼나?</p>
+</div>
+<x-shape kind="arrow-right" style="background:#F59E0B;width:72px;height:40px"></x-shape>
+<div style="width:270px;background:#FFFFFF;border-radius:32px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;border:5px solid #4ADE80">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:72px;color:#15803D;line-height:1">+1</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;text-align:center;line-height:1.2">점수를<br>써요</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FFE2C7;border-radius:28px;padding:28px 40px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">신호 바통</p>
+<p style="font-size:30px;font-weight:700;background:#FFFFFF;padding:10px 24px;border-radius:999px">컴퓨터차례</p>
+<p style="font-size:30px">→</p>
+<p style="font-size:30px;font-weight:700;background:#FFFFFF;padding:10px 24px;border-radius:999px">판정하기</p>
+<p style="font-size:30px">→</p>
+<p style="font-size:30px;font-weight:700;background:#FFFFFF;padding:10px 24px;border-radius:999px">결과표시</p>
+<p style="font-size:28px;color:#4A5568">차례대로 넘겨요</p>
+</div>
+<aside>게임 전체 순서를 먼저 그림으로 이해해요. 화살표마다 신호가 바통처럼 넘어가요. 나 → (컴퓨터차례) → 컴퓨터 → (판정하기) → 결과 → (결과표시) → 점수판.</aside>
+</section>
+<section id="step1" data-section="엔트리에서 차례대로 만들기" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:72px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">1단계</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">무대 꾸미기</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 36px;display:flex;flex-direction:row;gap:24px;align-items:center">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:56px;color:#2563EB">1</p>
+<p style="font-size:34px;line-height:1.4"><b>나</b>와 <b>컴퓨터</b> 오브젝트를 추가해요</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 36px;display:flex;flex-direction:row;gap:24px;align-items:center">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:56px;color:#2563EB">2</p>
+<p style="font-size:34px;line-height:1.4">모양 탭에서 <b>기본 → 가위 → 바위 → 보</b> 순서로 4개를 넣어요</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 36px;display:flex;flex-direction:row;gap:24px;align-items:center">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:56px;color:#2563EB">3</p>
+<p style="font-size:34px;line-height:1.4">글상자 2개: <b>점수판</b>, <b>결과</b></p>
+</div>
+</div>
+<p style="font-size:32px;font-weight:700;color:#C2410C;background:#FFE2C7;padding:20px 32px;border-radius:24px">모양 이름을 가위·바위·보로 바꿔 주세요!</p>
+</div>
+<img src="img/shapes-list.png" alt="엔트리 모양 탭: 나, 가위, 바위, 보 모양 4개" style="width:600px;height:808px;object-fit:contain;border-radius:28px;border:6px solid #FFFFFF;box-shadow:0px 12px 40px rgba(38,48,70,0.15);background:#FFFFFF">
+<aside>나 오브젝트와 컴퓨터 오브젝트 모두 모양이 4개예요. 첫 번째는 기본 얼굴, 그다음 가위, 바위, 보 순서예요. 모양 이름을 정확히 "가위", "바위", "보"로 지어야 나중에 블록에서 이름으로 찾을 수 있어요.</aside>
+</section>
+<section id="step3" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:72px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">2·3단계 · 나 오브젝트</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">시작하고,<br>손을 내요</h2>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:32px 36px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:44px;font-weight:400;color:#15803D">시작하면</h3>
+<p style="font-size:32px;line-height:1.45">점수를 0으로 만들고 규칙을 말해요</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:32px 36px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:44px;font-weight:400;color:#2563EB">1 키를 누르면</h3>
+<p style="font-size:32px;line-height:1.45">① 나의선택을 1로 정하기<br>② 가위 모양으로 바꾸기<br>③ 컴퓨터차례 신호 보내기</p>
+</div>
+<p style="font-size:32px;line-height:1.45;color:#4A5568">2·3 키도 숫자와 모양만 바꿔서 똑같이!</p>
+</div>
+<img src="img/code-me.png" alt="나 오브젝트 코드: 시작하기와 1, 2, 3 키 블록" style="width:700px;height:824px;object-fit:contain;border-radius:28px;background:#FFFFFF;border:6px solid #FFFFFF;box-shadow:0px 12px 40px rgba(38,48,70,0.15)">
+<aside>1 키 블록을 먼저 완성한 뒤 복사해서 2, 3 키를 만들면 빨라요. 복사한 뒤 바꿀 곳은 두 군데예요: 키 숫자와 나의선택 숫자, 그리고 모양 이름.</aside>
+</section>
+<section id="step4" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">4단계 · 컴퓨터 오브젝트</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">컴퓨터는<br>주사위를 굴려요</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center">
+<img src="img/robot.png" alt="컴퓨터 로봇" style="width:150px;height:150px;object-fit:contain">
+<p style="font-size:34px;line-height:1.45"><b>1부터 3 사이의 무작위 수</b><br>= 1, 2, 3 중 아무거나!</p>
+</div>
+<p style="font-size:32px;line-height:1.45">고른 숫자에 맞는 모양으로 바꾸고<br><b>판정하기</b> 신호를 보내요</p>
+<div style="background:#7C3AED;border-radius:28px;padding:28px 36px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#FBF7FF">★ 다음 시간에 바꿀 곳</p>
+<p style="font-size:30px;line-height:1.4;color:#EDE4FF">무작위 수 한 줄만 바꾸면<br>똑똑한 컴퓨터가 돼요</p>
+</div>
+</div>
+<img src="img/code-com.png" alt="컴퓨터 오브젝트 코드: 무작위 수로 컴퓨터선택을 정하고 모양을 바꾼 뒤 판정하기 신호 보내기" style="width:900px;height:662px;object-fit:contain;border-radius:28px;background:#FFFFFF;border:6px solid #FFFFFF;box-shadow:0px 12px 40px rgba(38,48,70,0.15)">
+<aside>[계산] 블록의 "1부터 3 사이의 무작위 수"는 주사위처럼 매번 다른 숫자를 줘요. 컴퓨터선택이 1이면 가위, 2면 바위, 3이면 보 모양으로 바꿔요. 다 고르면 판정하기 신호로 결과 글상자에게 바통을 넘겨요. 맨 위 한 줄은 다음 시간 예측 모델에서 바꿀 부분이에요.</aside>
+</section>
+<section id="table9" data-section="승패 판정의 비밀" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">5단계 · 생각해 보기</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">가위바위보, 경우는 모두 몇 가지?</h2>
+</div>
+<table style="font-family:'Jua', Arial, sans-serif;font-size:44px;color:#263046;background:#FFFFFF;border-radius:24px">
+<tr style="background:#FFE2C7"><th style="width:28%;text-align:center">나 \ 컴퓨터</th><th style="width:24%;text-align:center">가위 1</th><th style="width:24%;text-align:center">바위 2</th><th style="width:24%;text-align:center">보 3</th></tr>
+<tr><td style="text-align:center">가위 1</td><td style="text-align:center;color:#6B7280">비김</td><td style="text-align:center;color:#7C3AED">짐</td><td style="text-align:center;color:#C2410C">이김</td></tr>
+<tr style="background:#FFFBF3"><td style="text-align:center">바위 2</td><td style="text-align:center;color:#C2410C">이김</td><td style="text-align:center;color:#6B7280">비김</td><td style="text-align:center;color:#7C3AED">짐</td></tr>
+<tr><td style="text-align:center">보 3</td><td style="text-align:center;color:#7C3AED">짐</td><td style="text-align:center;color:#C2410C">이김</td><td style="text-align:center;color:#6B7280">비김</td></tr>
+</table>
+<p style="font-size:34px;line-height:1.45">3 × 3 = <b>9가지</b>! 만일 블록 9개로 만들 수도 있지만… <b>더 짧게</b> 할 수 없을까요?</p>
+<aside>먼저 표를 비워 두고 학생들이 직접 채우게 해 보세요. "이김", "짐"은 "나" 입장이에요. 9가지를 만일 블록으로 모두 쓰면 아주 길어져요. 다음 장에서 숫자의 비밀을 찾아봐요.</aside>
+</section>
+<section id="minus" data-transition="fade" style="background:#263046;color:#F4F1EA;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#FDBA74">5단계 · 뺄셈의 비밀</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15;color:#FFF6E5">판정 = 나의선택 − 컴퓨터선택</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:40px">
+<div style="flex:1;background:#3A4560;border-radius:36px;padding:40px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:110px;color:#E5E7EB;line-height:1">0</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:48px;color:#FFF6E5">비겼어요</p>
+<p style="font-size:30px;color:#C9D2E3">예) 바위 2 − 바위 2 = 0</p>
+</div>
+<div style="flex:1;background:#FFE2C7;border-radius:36px;padding:40px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:110px;color:#C2410C;line-height:1">1, −2</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:48px;color:#263046">내가 이겼어요</p>
+<p style="font-size:30px;color:#4A5568">예) 바위 2 − 가위 1 = 1</p>
+</div>
+<div style="flex:1;background:#EDE4FF;border-radius:36px;padding:40px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:110px;color:#6D28D9;line-height:1">−1, 2</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:48px;color:#263046">컴퓨터가 이겼어요</p>
+<p style="font-size:30px;color:#4A5568">예) 가위 1 − 바위 2 = −1</p>
+</div>
+</div>
+<p style="font-size:34px;line-height:1.45;color:#C9D2E3">9가지 경우가 <b style="color:#FDBA74">빼기 한 번</b>으로 3가지로 줄어들어요!</p>
+<aside>표의 9칸을 모두 "나 − 컴퓨터"로 계산해 보게 하세요. 비기면 항상 0, 내가 이기면 1 또는 −2, 지면 −1 또는 2가 나와요. 가위(1)가 보(3)를 이길 때는 1 − 3 = −2라서 특별해요. 가위바위보가 빙글빙글 도는 관계이기 때문이에요.</aside>
+</section>
+<section id="step5" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:560px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">5단계 · 결과 글상자</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">블록으로<br>판정해요</h2>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 32px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#6B7280">판정 = 0</p>
+<p style="font-size:30px">“비겼어요!”</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 32px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#C2410C">판정 = 1 또는 −2</p>
+<p style="font-size:30px">나의점수 +1, “내가 이겼어요!”</p>
+</div>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 32px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#6D28D9">그 밖의 경우</p>
+<p style="font-size:30px">컴퓨터점수 +1, “컴퓨터가 이겼어요!”</p>
+</div>
+</div>
+<img src="img/code-judge.png" alt="결과 글상자 코드: 판정을 계산하고 만일 블록으로 비김, 이김, 짐을 나누기" style="width:1040px;height:744px;object-fit:contain;border-radius:28px;background:#FFFFFF;border:6px solid #FFFFFF;box-shadow:0px 12px 40px rgba(38,48,70,0.15)">
+<aside>만일 블록 안에 또 만일 블록이 들어 있어요. 먼저 비겼는지 보고, 아니면 내가 이겼는지 봐요. 둘 다 아니면 컴퓨터가 이긴 거예요. "또는" 블록은 [판단] 꾸러미에 있어요. 마지막에 결과표시 신호로 점수판에게 바통을 넘겨요.</aside>
+</section>
+<section id="step6" data-section="점수판, 테스트, 마무리" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">6단계 · 점수판 글상자</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">글자를 합쳐서 점수를 써요</h2>
+</div>
+<img src="img/code-score.png" alt="점수판 코드: 결과표시 신호를 받으면 나의점수와 콜론과 컴퓨터점수를 합쳐서 글쓰기" style="width:1664px;height:206px;object-fit:contain;border-radius:24px;background:#FFFFFF">
+<div style="display:flex;flex-direction:row;gap:28px;align-items:center;justify-content:center">
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 40px;display:flex;flex-direction:column;align-items:center;gap:8px;border:5px solid #F472B6">
+<p style="font-size:30px;color:#4A5568">나의점수</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:96px;line-height:1">1</p>
+</div>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:72px;color:#C2410C">+</p>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 40px;display:flex;flex-direction:column;align-items:center;gap:8px;border:5px solid #FBBF24">
+<p style="font-size:30px;color:#4A5568">글자</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:96px;line-height:1">:</p>
+</div>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:72px;color:#C2410C">+</p>
+<div style="background:#FFFFFF;border-radius:28px;padding:28px 40px;display:flex;flex-direction:column;align-items:center;gap:8px;border:5px solid #A78BFA">
+<p style="font-size:30px;color:#4A5568">컴퓨터점수</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:96px;line-height:1">0</p>
+</div>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:72px;color:#C2410C">=</p>
+<div style="background:#263046;border-radius:28px;padding:28px 48px;display:flex;flex-direction:column;align-items:center;gap:8px">
+<p style="font-size:30px;color:#C9D2E3">점수판</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:96px;line-height:1;color:#FFF6E5">1 : 0</p>
+</div>
+</div>
+<aside>[계산] 꾸러미의 "~과(와) ~을(를) 합친 값" 블록을 두 번 써요. 나의점수와 " : "를 합치고, 그 결과에 컴퓨터점수를 또 합쳐요. 그러면 "1 : 0"처럼 보여요.</aside>
+</section>
+<section id="test" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">7단계 · 테스트</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">실행해서 표와 맞는지 확인해요</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:40px">
+<div style="flex:1;background:#FFFFFF;border-radius:32px;padding:24px;display:flex;flex-direction:column;gap:20px">
+<img src="img/stage-play1.jpg" alt="나는 바위, 컴퓨터는 보: 컴퓨터가 이겼어요" style="width:480px;height:271px;object-fit:cover;border-radius:20px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#6D28D9">바위 vs 보</p>
+<p style="font-size:30px;line-height:1.4">2 − 3 = −1<br>컴퓨터가 이겼어요</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:32px;padding:24px;display:flex;flex-direction:column;gap:20px">
+<img src="img/stage-play2.jpg" alt="나는 가위, 컴퓨터도 가위: 비겼어요" style="width:480px;height:271px;object-fit:cover;border-radius:20px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#6B7280">가위 vs 가위</p>
+<p style="font-size:30px;line-height:1.4">1 − 1 = 0<br>비겼어요</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:32px;padding:24px;display:flex;flex-direction:column;gap:20px">
+<img src="img/stage-play3.jpg" alt="나는 보, 컴퓨터는 바위: 내가 이겼어요" style="width:480px;height:271px;object-fit:cover;border-radius:20px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#C2410C">보 vs 바위</p>
+<p style="font-size:30px;line-height:1.4">3 − 2 = 1<br>내가 이겼어요</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.45">왼쪽 위 <b>변수 창</b>에서 나의선택 · 컴퓨터선택 · 판정 숫자를 꼭 확인해요!</p>
+<aside>실제로 엔트리에서 실행한 화면이에요. 같은 키를 여러 번 눌러 9가지 경우를 모두 만들어 보고, 앞에서 만든 표와 결과가 맞는지 체크해요. 변수 창에서 판정 숫자를 보면 왜 그런 결과가 나왔는지 알 수 있어요.</aside>
+</section>
+<section id="relay" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">생각 퀴즈</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">왜 신호를 3개로 나눴을까요?</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:48px;display:flex;flex-direction:column;gap:24px;border:6px solid #A78BFA">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:52px;font-weight:400;color:#6D28D9">신호 1개로 동시에 출발하면?</h3>
+<p style="font-size:34px;line-height:1.5">컴퓨터가 고르기 <b>전에</b><br>판정부터 할 수도 있어요</p>
+<p style="font-size:34px;line-height:1.5;color:#6D28D9;font-weight:700">→ 결과가 이상해져요!</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:48px;display:flex;flex-direction:column;gap:24px;border:6px solid #FB923C">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:52px;font-weight:400;color:#C2410C">바통을 차례로 넘기면?</h3>
+<p style="font-size:34px;line-height:1.5">내 손 → 컴퓨터 → 판정 → 점수<br>순서가 절대 안 바뀌어요</p>
+<p style="font-size:34px;line-height:1.5;color:#C2410C;font-weight:700">→ 언제나 정확해요!</p>
+</div>
+</div>
+<aside>이어달리기에서 바통을 받아야 다음 선수가 뛰듯이, 신호를 받아야 다음 코드가 시작돼요. 모두에게 신호 하나를 한꺼번에 보내면 누가 먼저 실행될지 알 수 없어요. 학생들에게 먼저 답을 말해 보게 한 뒤 보여 주세요.</aside>
+</section>
+<section id="challenge" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">8단계 · 도전 과제</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">다 만들었다면 도전!</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:40px">
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:44px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:row;gap:8px">
+<span style="color:#F59E0B;width:56px;height:56px;font-size:48px;line-height:56px;display:inline-block;text-align:center">★</span>
+</div>
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400">쉬움 · 5점 먼저!</h3>
+<p style="font-size:32px;line-height:1.5">나의점수가 5가 되면<br>“우승!”을 말하고<br>모든 코드 멈추기</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:44px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:row;gap:8px">
+<span style="color:#F59E0B;width:56px;height:56px;font-size:48px;line-height:56px;display:inline-block;text-align:center">★</span>
+<span style="color:#F59E0B;width:56px;height:56px;font-size:48px;line-height:56px;display:inline-block;text-align:center">★</span>
+</div>
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400">보통 · 판 수 세기</h3>
+<p style="font-size:32px;line-height:1.5">변수 “판수”를 만들어<br>한 판마다 1씩 더하고<br>화면에 보여 주기</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border-radius:36px;padding:44px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:row;gap:8px">
+<span style="color:#F59E0B;width:56px;height:56px;font-size:48px;line-height:56px;display:inline-block;text-align:center">★</span>
+<span style="color:#F59E0B;width:56px;height:56px;font-size:48px;line-height:56px;display:inline-block;text-align:center">★</span>
+<span style="color:#F59E0B;width:56px;height:56px;font-size:48px;line-height:56px;display:inline-block;text-align:center">★</span>
+</div>
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400">어려움 · 기록하기</h3>
+<p style="font-size:32px;line-height:1.5">리스트 “기록”에<br>내가 낸 숫자를<br>계속 추가하기</p>
+</div>
+</div>
+<aside>어려움 과제인 "기록" 리스트는 다음 시간 예측 모델에서 꼭 필요한 데이터가 돼요. 시간이 있는 학생은 미리 만들어 보게 하세요.</aside>
+</section>
+<section id="think-rate" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">더 생각해 봐요 1 · ⭐⭐</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">내 승률은 몇 %일까요?</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="background:#FFFFFF;border-radius:36px;padding:44px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400;color:#C2410C">만들 기능</h3>
+<p style="font-size:34px;line-height:1.5">변수 <b>“판수”</b>를 만들고<br>점수판에 <b>승률</b>도 보여 주기</p>
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#263046;background:#FFE2C7;border-radius:20px;padding:20px 28px">승률 = 나의점수 ÷ 판수 × 100</p>
+</div>
+<div style="background:#FFFFFF;border-radius:36px;padding:36px 44px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:40px;font-weight:400;color:#6B7280">힌트</h3>
+<p style="font-size:30px;line-height:1.5">판정이 끝날 때마다 판수에 1 더하기<br>소수점이 길면? [계산]의 <b>반올림</b> 블록</p>
+</div>
+</div>
+<div style="width:700px;background:#7C3AED;color:#FFFFFF;border-radius:36px;padding:48px;display:flex;flex-direction:column;gap:32px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:52px;font-weight:400">🤔 생각 질문</h3>
+<p style="font-size:38px;line-height:1.5">100판을 하면<br>승률이 몇 %쯤 나올까요?</p>
+<p style="font-size:38px;line-height:1.5">먼저 <b>예상</b>하고,<br>직접 해 보고,<br><b>왜 그런지</b> 설명해 봐요!</p>
+</div>
+</div>
+<aside>정답: 30~35% 근처로 모여요. 9가지 경우 중 이기는 경우가 3가지라서 이길 확률이 1/3(약 33%)이에요. 판수가 적을 때는 승률이 크게 오르내리다가 많이 할수록 33%에 가까워지는 것도 함께 관찰하게 하세요. 판수 +1은 결과 글상자의 판정 코드 끝(결과표시 신호 보내기 전)에 넣으면 돼요. 점수판 글은 "0 : 0 (승률 0%)"처럼 합치기 블록을 여러 번 써서 만들 수 있어요.</aside>
+</section>
+<section id="think-combo" data-transition="fade" style="background:#EAF6FF;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">더 생각해 봐요 2 · ⭐⭐</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">연승 콤보! “3연승!”</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="background:#FFFFFF;border-radius:36px;padding:44px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400;color:#C2410C">만들 기능</h3>
+<p style="font-size:34px;line-height:1.5">변수 <b>“연승”</b>을 만들고<br>연승이 3 이상이면<br>나 캐릭터가 “○연승!”을 말하기</p>
+</div>
+<div style="background:#FFFFFF;border-radius:36px;padding:36px 44px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:40px;font-weight:400;color:#6B7280">힌트</h3>
+<p style="font-size:30px;line-height:1.5">판정하는 “만일” 블록 안에<br>연승을 바꾸는 블록을 넣어요</p>
+</div>
+</div>
+<div style="width:760px;background:#FFFFFF;border-radius:36px;padding:48px;display:flex;flex-direction:column;gap:28px;border:6px solid #A78BFA">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:52px;font-weight:400;color:#6D28D9">🤔 빈칸을 채워 봐요</h3>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FFE2C7;border-radius:24px;padding:24px 32px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;width:200px;color:#C2410C">이겼을 때</p>
+<p style="font-size:34px">연승을 ______</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#EDE9FE;border-radius:24px;padding:24px 32px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;width:200px;color:#6D28D9">졌을 때</p>
+<p style="font-size:34px">연승을 ______</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#F3F4F6;border-radius:24px;padding:24px 32px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;width:200px;color:#6B7280">비겼을 때</p>
+<p style="font-size:34px">연승을 ______ ?</p>
+</div>
+</div>
+</div>
+<aside>정답: 이겼을 때는 연승에 1 더하기, 졌을 때는 연승을 0으로 정하기예요. 비겼을 때는 정답이 하나가 아니에요. "그대로 두기"와 "0으로 정하기" 중 어느 규칙이 더 공정한지 모둠별로 토론하고 정하게 하세요. 규칙을 정하는 것도 프로그래머가 하는 일이라는 점을 짚어 주면 좋아요. 연승은 시작할 때 0으로 정해야 해요.</aside>
+</section>
+<section id="think-match" data-transition="fade" style="background:#FFF6E5;color:#263046;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#C2410C">더 생각해 봐요 3 · ⭐⭐⭐</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:72px;font-weight:400;line-height:1.15">3판 2선승 + 다시 시작</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="background:#FFFFFF;border-radius:36px;padding:44px;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:48px;font-weight:400;color:#C2410C">만들 기능</h3>
+<p style="font-size:34px;line-height:1.5">먼저 <b>2번</b> 이긴 쪽이 우승!<br>우승을 말하면 경기 끝<br><b>스페이스</b> 키로 새 경기 시작</p>
+</div>
+<div style="background:#FFFFFF;border-radius:36px;padding:36px 44px;display:flex;flex-direction:column;gap:12px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:40px;font-weight:400;color:#6B7280">힌트</h3>
+<p style="font-size:30px;line-height:1.5">“경기 중인지 아닌지”를 기억하는<br>변수가 하나 있으면 어떨까요?</p>
+</div>
+</div>
+<div style="width:760px;background:#7C3AED;color:#FFFFFF;border-radius:36px;padding:48px;display:flex;flex-direction:column;gap:36px">
+<h3 style="font-family:'Jua', Arial, sans-serif;font-size:52px;font-weight:400">🤔 생각 질문</h3>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#FDBA74">질문 1</p>
+<p style="font-size:36px;line-height:1.5">경기가 끝나는 순간은 언제일까요?<br>누구의 점수를 확인해야 할까요?</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:40px;color:#FDBA74">질문 2</p>
+<p style="font-size:36px;line-height:1.5">우승한 뒤에도 1, 2, 3 키를 누르면<br>게임이 계속돼요. 어떻게 막을까요?</p>
+</div>
+</div>
+</div>
+<aside>질문 1 정답: 나의점수가 2이거나 컴퓨터점수가 2일 때예요. 점수가 바뀐 직후(점수판이 결과표시 신호를 받을 때)에 확인하면 돼요. 질문 2 정답: 변수 "경기중"을 만들어 시작할 때 1, 우승하면 0으로 정해요. 1·2·3 키 코드는 "만일 경기중 = 1이라면" 안에 넣어요. 스페이스 키를 누르면 두 점수를 0, 경기중을 1로 바꿔 새 경기를 시작해요. 학생들이 먼저 "모든 코드 멈추기"를 떠올리면, 그러면 다시 시작할 수 없다는 점을 스스로 발견하게 해 주세요.</aside>
+</section>
+<section id="next" data-transition="fade" style="background:#263046;color:#F4F1EA;font-family:'Nanum Gothic', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:80px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:36px;color:#FDBA74">다음 시간 예고</p>
+<h2 style="font-family:'Jua', Arial, sans-serif;font-size:80px;font-weight:400;line-height:1.2;color:#FFF6E5">컴퓨터가 더 잘<br>이기려면 무엇을<br>알아야 할까요?</h2>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;background:#3A4560;border-radius:32px;padding:32px 40px">
+<p style="font-family:'Jua', Arial, sans-serif;font-size:96px;color:#FDBA74;line-height:1">1/3</p>
+<p style="font-size:34px;line-height:1.45;color:#C9D2E3">지금 컴퓨터가 이길 확률<br>3판 중 1판 정도예요</p>
+</div>
+<p style="font-size:36px;line-height:1.45;color:#FFF6E5">힌트: <b style="color:#FDBA74">내 습관</b>을 기억하면 어떨까요?</p>
+</div>
+<img src="img/robot.png" alt="똑똑해질 컴퓨터 로봇" style="width:560px;height:560px;object-fit:contain">
+<aside>무작위로 내는 컴퓨터는 이길 확률이 1/3이에요. 사람은 "가위 다음엔 바위"처럼 습관이 있어요. 다음 시간에는 컴퓨터가 내 습관을 기록하고, 다음 수를 예측해서 이기는 수를 내도록 바꿔요. 바꿀 곳은 4단계의 무작위 수 한 줄이에요.</aside>
+</section>
+</div>
+<div id="notes"></div>
+<div id="bar"><button id="prev">◀ 이전</button><span id="count"></span><button id="next">다음 ▶</button><button id="nbtn">선생님 메모 (N)</button><button id="fbtn">전체 화면 (F)</button></div>
+<script>
+const stage=document.getElementById('stage'),S=[...stage.children],notes=document.getElementById('notes'),count=document.getElementById('count');
+let i=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform='translate(-50%,-50%) scale('+k+')'}
+function show(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,j)=>s.classList.toggle('on',j===i));const a=S[i].querySelector('aside');notes.textContent=a?a.textContent:'(메모 없음)';count.textContent=(i+1)+' / '+S.length;history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(i+1)}else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(i-1)}else if(e.key==='Home')show(0);else if(e.key==='End')show(S.length-1);else if(e.key==='n'||e.key==='N')document.body.classList.toggle('notes');else if(e.key==='f'||e.key==='F')toggleFs()});
+function toggleFs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}
+stage.addEventListener('click',e=>{show(e.clientX<innerWidth/3?i-1:i+1)});
+document.getElementById('prev').onclick=()=>show(i-1);document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('nbtn').onclick=()=>document.body.classList.toggle('notes');document.getElementById('fbtn').onclick=toggleFs;
+fit();show(i);
+</script>
+</body>
+</html>
