@@ -16,6 +16,12 @@ html,body{height:100%;background:#111;overflow:hidden}
 #stage>section.on{opacity:1;visibility:visible}
 section aside{display:none}
 img{display:block}
+*{word-break:keep-all}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+table{border-collapse:separate;border-spacing:0;overflow:hidden;width:100%}
+td,th{padding:.35em .6em}
+tr+tr td{border-top:2px solid #E5E7EB}
 #bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;font:14px 'Nanum Gothic',sans-serif;color:#ddd;opacity:0;transition:opacity .3s}
 body:hover #bar{opacity:1}
 #bar button{background:#333;color:#eee;border:0;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
