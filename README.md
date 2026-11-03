@@ -31,4 +31,34 @@
 7. 3단계: 예측한 손을 이기는 손 내기
 8. 실험하고 정리하기
 
+## 우주 비행기 게임 만들기 (CODE_Boost 주말 코딩 캠프)
+
+2026학년도 결빛 네트워크 연계 구산 「CODE_Boost」 주말 코딩 캠프 수업 자료예요. 초등 4~5학년이 한 번의 수업에서 슈팅 게임을 처음부터 끝까지 만들어요. 강사는 부내초 교사 유경윤이에요.
+
+| 자료 | 주소 |
+|---|---|
+| 슬라이드 (40장) | https://liebe842.github.io/rps-slides/plane/ |
+| PDF (슬라이드만) | https://liebe842.github.io/rps-slides/plane/slides.pdf |
+| PDF (선생님 메모 포함) | https://liebe842.github.io/rps-slides/plane/slides-notes.pdf |
+| 시작 파일 (그림만, 코드 없음) | https://liebe842.github.io/rps-slides/plane/files/start.ent |
+| 완성본 | https://liebe842.github.io/rps-slides/plane/files/complete.ent |
+
+- **조작:** ← → 키로 비행기를 움직이고, 스페이스로 총알을 쏴요. 운석을 맞히면 점수 +1, 운석에 부딪히면 게임 끝이에요.
+- **늦은 학생용 단계 파일:**
+  - `files/step1.ent` 배경까지
+  - `files/step2.ent` 비행기까지
+  - `files/step3.ent` 피하기 게임까지
+  - `files/step4.ent` 총알까지
+- **PDF 받기:** 슬라이드 화면 아래 버튼 줄에서 바로 받을 수 있어요.
+
+구성:
+
+1. 오늘 만들 게임, 시작 파일, 오브젝트, 무대 좌표
+2. 1단계: 배경 두 장을 이어 붙여 흘려 보내기
+3. 2단계: 계속 반복 + 만일로 비행기를 부드럽게 움직이기
+4. 3단계: 복제본으로 운석 떨어뜨리기, 부딪히면 게임 끝 (피하기 게임 완성)
+5. 4단계: 스페이스로 총알 복제본 쏘기
+6. 5단계: 점수 변수, 그리고 "총알이 먼저 사라져 운석이 안 터지는" 버그 잡기
+7. 막혔을 때 확인하기, 도전 과제, 저장과 겨루기
+
 게임은 [entry-vibe-coding](https://github.com/205sla/entry-vibe-coding) 환경으로 만들었어요. 그림은 Codex로 생성했어요.
