@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>우주 비행기 게임 만들기</title>
+<title>객체지향 프로그래밍을 활용하여 우주 비행기 게임 만들기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
@@ -74,6 +74,7 @@ b.o{color:#C2410C}b.b{color:#1D4ED8}b.p{color:#6D28D9}
 .cover{padding:72px 128px 88px}
 .band{font-family:'Jua',Arial,sans-serif;font-size:40px;color:#1E1B4B;background:#FDE68A;border-radius:24px;padding:18px 36px;align-self:stretch;text-align:center}
 .teacher{font-family:'Jua',Arial,sans-serif;font-size:40px;color:#1E1B4B;background:#C7D2FE;border-radius:999px;padding:12px 32px;align-self:flex-start}
+.tag{font-family:'Jua',Arial,sans-serif;font-size:32px;padding:8px 24px;border-radius:999px;background:#6366F1;color:#FFFFFF;flex:none}
 .pill{font-family:'Jua',Arial,sans-serif;font-size:36px;background:#312E81;color:#FDBA74;border-radius:20px;padding:16px 26px}
 #bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;font:14px 'Nanum Gothic',sans-serif;color:#ddd;opacity:0;transition:opacity .3s}
 body:hover #bar{opacity:1}
@@ -101,14 +102,14 @@ body.notes #notes{display:block}
 <p class="band">2026학년도 결빛 네트워크 연계 구산 「CODE_Boost」 주말 코딩 캠프</p>
 <div class="row" style="align-items:center;gap:64px;flex:1">
   <div class="col" style="flex:1;gap:28px">
-    <p class="k" style="font-size:40px">엔트리 게임 프로젝트</p>
+    <p class="k" style="font-size:46px;color:#FDBA74">객체지향 프로그래밍을 활용하여</p>
     <h1>우주 비행기<br>게임 만들기</h1>
-    <p style="font-size:42px;font-weight:700;color:#C7D2FE;line-height:1.4">운석을 피하고 맞히는<br>나만의 슈팅 게임</p>
+    <p style="font-size:40px;font-weight:700;color:#C7D2FE;line-height:1.4">틀 하나로 운석 100개!<br>나만의 슈팅 게임</p>
     <p class="teacher">강사 · 부내초 교사 유경윤</p>
   </div>
-  <img src="img/hero.jpg" alt="웃는 비행기가 우주에서 노란 총알을 쏘아 운석을 터뜨리는 그림" style="width:900px;height:506px;object-fit:cover;border-radius:40px;border:8px solid #312E81;box-shadow:0 20px 60px rgba(0,0,0,.45)">
+  <img src="img/hero.jpg" alt="웃는 비행기가 우주에서 노란 총알을 쏘아 운석을 터뜨리는 그림" style="width:820px;height:461px;object-fit:cover;border-radius:40px;border:8px solid #312E81;box-shadow:0 20px 60px rgba(0,0,0,.45)">
 </div>
-<aside>오늘은 엔트리로 우주 비행기 게임을 처음부터 끝까지 만들어요. 배경이 흐르고, 비행기가 움직이고, 운석이 떨어지고, 총알로 맞히면 점수가 올라가요. 한 단계씩 만들고 그때마다 실행해서 확인해요.</aside>
+<aside>오늘은 엔트리로 우주 비행기 게임을 처음부터 끝까지 만들어요. 배경이 흐르고, 비행기가 움직이고, 운석이 떨어지고, 총알로 맞히면 점수가 올라가요. 제목의 "객체지향 프로그래밍"은 원본 오브젝트를 틀(클래스)로, 복제본을 그 틀로 찍어 낸 객체(인스턴스)로 보는 생각을 말해요. 운석과 총알 복제본이 같은 코드로 각자 움직이는 것이 그 핵심이에요(16번 슬라이드). 상속이나 캡슐화 같은 객체지향의 다른 기능은 이 수업에서 다루지 않아요.</aside>
 </section>
 <section id="game" class="s A">
 
@@ -390,8 +391,12 @@ body.notes #notes{display:block}
   </div>
 </div>
 <p class="big" style="text-align:center">운석을 하나하나 만들지 않고, <b class="o">틀 하나로 여러 개</b> 찍어 내요!</p>
+<div class="card warm" style="flex-direction:row;align-items:center;gap:24px;padding:24px 36px">
+  <span class="tag">객체지향</span>
+  <p class="t">틀을 <b class="p">클래스</b>, 틀로 찍어 낸 하나하나를 <b class="p">객체</b>라고 불러요</p>
 </div>
-<aside>쿠키 틀 하나로 쿠키를 여러 개 찍어 내듯, 오브젝트 하나로 똑같은 오브젝트를 여러 개 만들 수 있어요. 복제본은 "복제본이 처음 생성되었을 때" 아래의 코드로 각자 움직여요. 운석 오브젝트를 10개 만들지 않아도 된다는 점이 핵심이에요.</aside>
+</div>
+<aside>쿠키 틀 하나로 쿠키를 여러 개 찍어 내듯, 오브젝트 하나로 똑같은 오브젝트를 여러 개 만들 수 있어요. 복제본은 "복제본이 처음 생성되었을 때" 아래의 코드로 각자 움직여요. 운석 오브젝트를 10개 만들지 않아도 된다는 점이 핵심이에요. 이것이 오늘 제목의 객체지향 프로그래밍과 이어지는 부분이에요. 틀(클래스) 하나를 만들어 두고 거기서 객체(인스턴스)를 여러 개 만들어 쓰는 생각이에요. 엔트리 복제본은 원본의 지금 모습을 그대로 복사하는 방식이라, 원본이 숨어 있으면 복제본도 숨은 채로 태어나요.</aside>
 </section>
 <section id="meteor-factory" class="s B">
 
@@ -764,7 +769,7 @@ body.notes #notes{display:block}
     <p class="k">오늘 배운 것</p>
     <h2 style="font-size:76px;line-height:1.25;color:#F5F3FF">한 단계씩 만들고<br>실행해서 확인하면<br>게임이 돼요!</h2>
     <div class="row" style="gap:16px;flex-wrap:wrap">
-      <p class="pill">좌표</p><p class="pill">반복과 조건</p><p class="pill">복제본</p><p class="pill">변수</p><p class="pill">버그 잡기</p>
+      <p class="pill">객체지향 (틀과 객체)</p><p class="pill">좌표</p><p class="pill">반복과 조건</p><p class="pill">변수</p><p class="pill">버그 잡기</p>
     </div>
   </div>
   <img src="img/plane.png" alt="완성한 우주 비행기" style="width:460px;height:460px;object-fit:contain;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))">
