@@ -37,18 +37,19 @@
 
 | 자료 | 주소 |
 |---|---|
-| 슬라이드 (40장) | https://liebe842.github.io/rps-slides/plane/ |
+| 슬라이드 (45장) | https://liebe842.github.io/rps-slides/plane/ |
 | PDF (슬라이드만) | https://liebe842.github.io/rps-slides/plane/slides.pdf |
 | PDF (선생님 메모 포함) | https://liebe842.github.io/rps-slides/plane/slides-notes.pdf |
 | 시작 파일 (그림만, 코드 없음) | https://liebe842.github.io/rps-slides/plane/files/start.ent |
-| 완성본 | https://liebe842.github.io/rps-slides/plane/files/complete.ent |
+| 완성본 (6단계까지) | https://liebe842.github.io/rps-slides/plane/files/complete.ent |
 
-- **조작:** ← → 키로 비행기를 움직이고, 스페이스로 총알을 쏴요. 운석을 맞히면 점수 +1, 운석에 부딪히면 게임 끝이에요.
+- **조작:** ← → 키로 비행기를 움직이고, 스페이스로 총알을 쏴요. 운석을 맞히면 점수 +1, 운석에 부딪히면 게임 끝, 60초를 버티면 성공이에요.
 - **늦은 학생용 단계 파일:**
   - `files/step1.ent` 배경까지
   - `files/step2.ent` 비행기까지
   - `files/step3.ent` 피하기 게임까지
   - `files/step4.ent` 총알까지
+  - `files/step5.ent` 점수와 버그 잡기까지
 - **PDF 받기:** 슬라이드 화면 아래 버튼 줄에서 바로 받을 수 있어요.
 
 구성:
@@ -59,6 +60,7 @@
 4. 3단계: 복제본으로 운석 떨어뜨리기, 부딪히면 게임 끝 (피하기 게임 완성)
 5. 4단계: 스페이스로 총알 복제본 쏘기
 6. 5단계: 점수 변수, 그리고 "총알이 먼저 사라져 운석이 안 터지는" 버그 잡기
-7. 막혔을 때 확인하기, 도전 과제, 저장과 겨루기
+7. 6단계: 비행기·운석 크기 줄이기, 초시계로 60초 버티면 성공 (모든 코드 멈추기는 초시계를 멈추지 않아 초시계 정지하기도 함께)
+8. 막혔을 때 확인하기, 도전 과제, 저장과 겨루기
 
 게임은 [entry-vibe-coding](https://github.com/205sla/entry-vibe-coding) 환경으로 만들었어요. 그림은 Codex로 생성했어요.
